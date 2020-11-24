@@ -11,12 +11,13 @@ public class FlashlightController : MonoBehaviour {
 
         if (Input.GetKeyUp (KeyCode.F)) {
 
-            if(isOn)
-            {
-                flashlightOn.Play();
-            }else
+            if(!isOn)
             {
                 flashlightOff.Play();
+               
+            }else
+            {
+                 flashlightOn.Play();
             }
 
             flashlight.SetActive (!isOn);

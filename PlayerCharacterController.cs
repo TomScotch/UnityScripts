@@ -29,8 +29,8 @@ public class PlayerCharacterController : MonoBehaviour
     public float capsuleHeightCrouching = 0.9f;
     public float crouchingSharpness = 10f;
 
-    public float footstepSFXFrequency = 1f;
-    public float footstepSFXFrequencyWhileSprinting = 1f;
+    public float footstepSFXFrequency = 4f;
+    public float footstepSFXFrequencyWhileSprinting = 3f;
     public AudioClip footstepSFX;
     public AudioClip jumpSFX;
     public AudioClip landSFX;
@@ -194,10 +194,10 @@ public class PlayerCharacterController : MonoBehaviour
                 }
 
                 float chosenFootstepSFXFrequency = (isSprinting ? footstepSFXFrequencyWhileSprinting : footstepSFXFrequency);
-                if (m_footstepDistanceCounter >= 1f / chosenFootstepSFXFrequency)
+                if (m_footstepDistanceCounter >= 3f / chosenFootstepSFXFrequency)
                 {
                     m_footstepDistanceCounter = 0f;
-                   // audioSource.PlayOneShot(footstepSFX);
+                    audioSource.PlayOneShot(footstepSFX);
                 }
 
                 m_footstepDistanceCounter += characterVelocity.magnitude * Time.deltaTime;

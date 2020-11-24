@@ -11,10 +11,13 @@ public class MoveRigidbodyOnCollisionTrigger : MonoBehaviour {
     }
 
     public Rigidbody rb;
-    public float force = 15f;
-    public Directions dir;
+    public float force1 = 50f;
+    public float force2 = 50f;
+    public Directions dir1;
+    public Directions dir2;
     public bool continous = false;
     public AudioSource sound;
+    public bool ActivateGravityOnCollision = false;
 
     private void OnTriggerEnter (Collider other) {
 
@@ -22,17 +25,41 @@ public class MoveRigidbodyOnCollisionTrigger : MonoBehaviour {
             sound.Play ();
         }
 
-        switch (dir) {
+        Vector3 vec1 = new Vector3 ();
+        Vector3 vec2 = new Vector3 ();
+
+        switch (dir1) {
             case Directions.Up:
-                rb.AddForce (transform.up * force);
+                vec1 = (transform.up * force1);
                 break;
             case Directions.Right:
-                rb.AddForce (transform.right * force);
+                vec1 = (transform.right * force1);
                 break;
             case Directions.Forward:
-                rb.AddForce (transform.forward * force);
+                vec1 = (transform.forward * force1);
                 break;
         }
+
+        switch (dir2) {
+            case Directions.Up:
+                vec2 = (transform.up * force2);
+                break;
+            case Directions.Right:
+                vec2 = (transform.right * force2);
+                break;
+            case Directions.Forward:
+                vec2 = (transform.forward * force2);
+                break;
+        }
+
+        rb.isKinematic = false;
+
+        if (ActivateGravityOnCollision) {
+
+            rb.useGravity = true;
+        }
+
+        rb.AddForce (vec1 + vec2);
 
         if (!continous) {
             gameObject.SetActive (false);
