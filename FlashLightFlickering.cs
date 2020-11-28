@@ -2,23 +2,28 @@ using System.Collections;
 using UnityEngine;
 
 /*
-/// Switch the light on and off at random. Use isActivated property to control the effect.
+/// Switch the light on and off at random.
 */
 
-public class FlashLightFlickering : MonoBehaviour {
+public class FlashLightFlickering : MonoBehaviour
+{
 
-    public bool isActivated { set; get; }
+    public Light flashlight;
+    public void begin()
+    {
+        StartCoroutine(FlashLightFlicker(flashlight));
+    }
+    public void end()
+    {
+        StopCoroutine(FlashLightFlicker(flashlight));
+    }
 
-    private void Start () => StartCoroutine (FlashLightFlicker ());
-    private void Stop () => StopCoroutine (FlashLightFlicker ());
-
-    IEnumerator FlashLightFlicker () {
-
-        while (isActivated) {
-
-            Light flashlight = gameObject.GetComponent (typeof (Light)) as Light;
+    IEnumerator FlashLightFlicker(Light flashlight)
+    {
+        while (true)
+        {
             flashlight.enabled = !flashlight.enabled;
-            yield return new WaitForSeconds (Random.Range (0, 1));
+            yield return new WaitForSeconds(Random.Range(0.3f, 1.2f));
         }
     }
 }

@@ -2,8 +2,7 @@
 
 public class FlashlightController : MonoBehaviour {
 
-    bool isOn = false;
-    public GameObject flashlight;
+    public Light flashlight;
     public AudioSource flashlightOn;
     public AudioSource flashlightOff;
 
@@ -11,7 +10,7 @@ public class FlashlightController : MonoBehaviour {
 
         if (Input.GetKeyUp (KeyCode.F)) {
 
-            if(!isOn)
+            if(!flashlight.enabled)
             {
                 flashlightOff.Play();
                
@@ -20,8 +19,7 @@ public class FlashlightController : MonoBehaviour {
                  flashlightOn.Play();
             }
 
-            flashlight.SetActive (!isOn);
-            isOn = !isOn;
+            flashlight.enabled = !flashlight.enabled;
         }
     }
 }

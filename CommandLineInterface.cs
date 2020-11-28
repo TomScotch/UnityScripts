@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static FlashLightFlickering;
 
 /*
 /// Parse Input to Dictionary and Return the Result of the Execution
@@ -9,24 +10,51 @@ using UnityEngine.UI;
 
 public class CommandLineInterface : MonoBehaviour
 {
-
-    private Dictionary<string, Procedure> CommandList = new Dictionary<string, Procedure>();
+    private Dictionary<string, Procedure> CommandList { get; } = new Dictionary<string, Procedure>();
     private delegate string Procedure(string input);
     private bool isOn = false;
     public InputField input;
-    // public Text text;
     public GameObject player;
 
-    public string Print(string inString) => inString;
+    private string Help(string inString)
+    {
+        //@TODO FILL RESOURCE FILE WITH COMMAND DESCRIPTIONS AND RETURN THEM
+        return "Need Help with " + inString + "?";
+    }
+    private string Print(string inString) => inString;
+    public FlashLightFlickering flicker;
+
+    private string Flicker(string inString)
+    {
+        if (flicker != null)
+        {
+
+            if (inString.Equals("on"))
+            {
+                player.SetActive(true);
+                flicker.begin();
+                //player.SetActive(false);
+            }
+            else if (inString.Equals("off"))
+            {
+                player.SetActive(true);
+                flicker.end();
+              //  player.SetActive(false);
+            }
+        }
+
+        return "Flashlight Flickering is " + inString;
+    }
 
     private void initCommandList()
     {
         CommandList.Add("print", Print);
+        CommandList.Add("help", Help);
+        CommandList.Add("flicker", Flicker);
     }
 
     void Update()
     {
-
         if (Input.GetKeyUp(KeyCode.F1))
         {
             isOn = !isOn;
@@ -35,14 +63,12 @@ public class CommandLineInterface : MonoBehaviour
 
             if (isOn)
             {
-                //    text.gameObject.SetActive(true);
                 input.gameObject.SetActive(true);
                 input.ActivateInputField();
                 player.SetActive(false);
             }
             else
             {
-                //        text.gameObject.SetActive(false);
                 input.gameObject.SetActive(false);
                 input.DeactivateInputField();
                 player.SetActive(true);
@@ -64,7 +90,6 @@ public class CommandLineInterface : MonoBehaviour
     void Start()
     {
         input.gameObject.SetActive(false);
-        // text.gameObject.SetActive(false);
         initCommandList();
     }
 
