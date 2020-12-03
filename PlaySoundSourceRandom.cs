@@ -12,7 +12,7 @@ public class PlaySoundSourceRandom : MonoBehaviour {
 
     void Update () {
 
-        counter += 0.1f; //Time.DeltaTime
+        counter += 0.1f;
 
         if (random == 0.0f) {
 

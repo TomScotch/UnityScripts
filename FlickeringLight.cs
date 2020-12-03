@@ -3,8 +3,7 @@ using UnityEngine;
 
 //[ExecuteInEditMode]
 public class FlickeringLight : MonoBehaviour {
-    [Tooltip ("light")]
-    public Light flashlight;
+    private Light flashlight;
     [Tooltip ("Minimum intensity")]
     public float minIntensity = 0.0025f;
     [Tooltip ("Maximum intensity")]
@@ -21,6 +20,7 @@ public class FlickeringLight : MonoBehaviour {
     }
 
     void Start () {
+        flashlight = GetComponent<Light>();
         smoothQueue = new Queue<float> (smoothing);
     }
 

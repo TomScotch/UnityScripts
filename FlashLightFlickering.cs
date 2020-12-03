@@ -8,13 +8,17 @@ using UnityEngine;
 public class FlashLightFlickering : MonoBehaviour
 {
 
+    public bool isFlickering { get; private set; }
+
     public Light flashlight;
     public void begin()
     {
+        isFlickering = true;
         StartCoroutine(FlashLightFlicker(flashlight));
     }
     public void end()
     {
+        isFlickering = false;
         StopCoroutine(FlashLightFlicker(flashlight));
     }
 
