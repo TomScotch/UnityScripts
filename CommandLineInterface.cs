@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.VFX;
 using static FlashLightFlickering;
+using static ShowFPS;
 
 /*
 /// Parse Input to Dictionary and Return the Result of the Execution
@@ -13,26 +14,6 @@ using static FlashLightFlickering;
 
 public class CommandLineInterface : MonoBehaviour
 {
-    public static IEnumerable<GameObject> GetAllRootGameObjects()
-    {
-        for (int i = 0; i < SceneManager.sceneCount; i++)
-        {
-            GameObject[] rootObjs = SceneManager.GetSceneAt(i).GetRootGameObjects();
-            foreach (GameObject obj in rootObjs)
-                yield return obj;
-        }
-    }
-
-    public static IEnumerable<T> FindAllObjectsOfTypeExpensive<T>()
-        where T : MonoBehaviour
-    {
-        foreach (GameObject obj in GetAllRootGameObjects())
-        {
-            foreach (T child in obj.GetComponentsInChildren<T>(true))
-                yield return child;
-        }
-    }
-
     Dictionary<string, Procedure> CommandList { get; } = new Dictionary<string, Procedure>();
     private delegate string Procedure(string input);
     private bool isOn = false;
@@ -40,81 +21,85 @@ public class CommandLineInterface : MonoBehaviour
     public TextMeshProUGUI output;
     public GameObject player;
     public FlashLightFlickering flicker;
+    public ShowFPS fps;
+    public GameObject lights;
 
+    private string ShowFPS(string inString)
+    {
+        if (inString.Equals("on"))
+        {
+            fps.enabled = true;
+        }
+        else
+        {
+            fps.enabled = false;
+        }
+
+        return "fps counter is : " + inString;
+    }
     private string Credits(string inString)
     {
         return GameResources._credits;
     }
-
     private string CmdList(string inString)
     {
         return GameResources._cmdlist;
     }
     private string SaveGame(string inString)
     {
-        SaveGame save = new SaveGame();
-        save.x = player.transform.position.x;
-        save.y = player.transform.position.y;
-        save.z = player.transform.position.z;
-        System.IO.File.WriteAllText(Application.persistentDataPath + "/" + inString + ".json", JsonUtility.ToJson(save));
-        return "save your game to : " + Application.persistentDataPath + "/" + inString + ".json";
+
+        string returntext;
+
+        if (player != null)
+        {
+            SaveGame save = new SaveGame();
+            save.x = player.transform.position.x;
+            save.y = player.transform.position.y;
+            save.z = player.transform.position.z;
+            System.IO.File.WriteAllText(Application.persistentDataPath + "/" + inString + ".json", JsonUtility.ToJson(save));
+            returntext = "save your game to : " + Application.persistentDataPath + "/" + inString + ".json";
+        }
+        else
+        {
+            returntext = GameResources._error;
+        }
+        return returntext;
     }
-    private string LoadGáme(string inString)
+    private string LoadGame(string inString)
     {
-        SaveGame save = JsonUtility.FromJson<SaveGame>(System.IO.File.ReadAllText(Application.persistentDataPath + "/" + inString + ".json"));
-        player.transform.position = new Vector3(save.x, save.y, save.z);
-        return "loaded your game from : " + Application.persistentDataPath + "/" + inString + ".json";
+        string returntext;
+
+        try
+        {
+            SaveGame save = JsonUtility.FromJson<SaveGame>(System.IO.File.ReadAllText(Application.persistentDataPath + "/" + inString + ".json"));
+            player.transform.position = new Vector3(save.x, save.y, save.z);
+            returntext = "loaded your game from : " + Application.persistentDataPath + "/" + inString + ".json";
+        }
+        catch (Exception ex) { returntext = GameResources._error + ex.Message; }
+
+        return returntext;
     }
     private string TurnLights(string inString)
     {
 
-        Light[] lights = GetComponents<Light>();
-        VisualEffect[] effects = GetComponents<VisualEffect>();
+        if (lights != null) {
 
-        foreach (VisualEffect effect in effects)
-        {
-            if (effect.enabled)
+            if (inString.Equals("on"))
             {
-                if (inString.Equals("off"))
-                {
-                    effect.enabled = false;
-                }
+                lights.SetActive(true);
             }
             else
             {
-                if (inString.Equals("on"))
-                {
-                    effect.enabled = true;
-                }
+                lights.SetActive(false);
             }
+
+            return "Lights are switched" + inString;
+        }
+        else
+        {
+            return GameResources._error;
         }
 
-        foreach (Light light in lights)
-        {
-            if (light.enabled)
-            {
-                if (inString.Equals("off"))
-                {
-                    light.enabled = false;
-                }
-                else if (inString.Equals(""))
-                {
-                    light.enabled = true;
-                }
-            }
-            else
-            {
-                if (inString.Equals("on"))
-                {
-                    light.enabled = true;
-                }
-                else if (inString.Equals(""))
-                {
-                    light.enabled = false;
-                }
-            }
-        }
-        return lights.Length + " Lights are switched" + inString;
     }
     private string Help(string inString)
     {
@@ -158,6 +143,9 @@ public class CommandLineInterface : MonoBehaviour
             case "credits":
                 helpstring = GameResources._help_credits;
                 break;
+            case "fps":
+                helpstring = GameResources._help_fps;
+                break;
             case "":
                 helpstring = GameResources._help_empty;
                 break;
@@ -172,8 +160,8 @@ public class CommandLineInterface : MonoBehaviour
         switchGui(onOff: "off");
         try
         {
-            ScreenCapture.CaptureScreenshot(Application.persistentDataPath + "/" + inString + ".png");
-            msg = "Screenshot save to : " + Application.persistentDataPath + "/" + inString + ".png";
+            ScreenCapture.CaptureScreenshot(Application.persistentDataPath + "/" + DateTime.Now + ".png");
+            msg = "Screenshot save to : " + Application.persistentDataPath + "/" + DateTime.Now + ".png";
         }
         catch (Exception ex)
         {
@@ -255,7 +243,8 @@ public class CommandLineInterface : MonoBehaviour
         CommandList.Add("screenshot", Screenshot);
         CommandList.Add("turnlights", TurnLights);
         CommandList.Add("save", SaveGame);
-        CommandList.Add("load", LoadGáme);
+        CommandList.Add("load", LoadGame);
+        CommandList.Add("fps", ShowFPS);
     }
 
     void Update()
@@ -297,7 +286,7 @@ public class CommandLineInterface : MonoBehaviour
             {
                 player.GetComponent<PlayerCharacterController>().enabled = false;
                 player.GetComponent<PlayerInputHandler>().enabled = false;
-                player.GetComponent<FlashlightController>().enabled = false;
+               // player.GetComponent<FlashlightController>().enabled = false;
             }
         }
         else
@@ -309,7 +298,7 @@ public class CommandLineInterface : MonoBehaviour
             {
                 player.GetComponent<PlayerCharacterController>().enabled = true;
                 player.GetComponent<PlayerInputHandler>().enabled = true;
-                player.GetComponent<FlashlightController>().enabled = true;
+                //player.GetComponent<FlashlightController>().enabled = true;
             }
         }
     }

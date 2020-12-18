@@ -69,6 +69,10 @@ public class PlayerCharacterController : MonoBehaviour
     const float k_JumpGroundingPreventionTime = 0.2f;
     const float k_GroundCheckDistanceInAir = 0.07f;
 
+    public Light flashlight;
+    public AudioSource flashlightOn;
+    public AudioSource flashlightOff;
+
     void Start()
     {
         m_Controller = GetComponent<CharacterController>();
@@ -110,6 +114,21 @@ public class PlayerCharacterController : MonoBehaviour
         UpdateCharacterHeight(false);
 
         HandleCharacterMovement();
+
+        if (Input.GetKeyUp(KeyCode.F))
+        {
+            if (!flashlight.enabled)
+            {
+                flashlightOff.Play();
+
+            }
+            else
+            {
+                flashlightOn.Play();
+            }
+
+            flashlight.enabled = !flashlight.enabled;
+        }
     }
 
     void GroundCheck()
