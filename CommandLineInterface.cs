@@ -1,10 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.VFX;
 using static FlashLightFlickering;
 using static ShowFPS;
 
@@ -47,23 +47,14 @@ public class CommandLineInterface : MonoBehaviour
     }
     private string SaveGame(string inString)
     {
-
-        string returntext;
-
-        if (player != null)
-        {
-            SaveGame save = new SaveGame();
-            save.x = player.transform.position.x;
-            save.y = player.transform.position.y;
-            save.z = player.transform.position.z;
-            System.IO.File.WriteAllText(Application.persistentDataPath + "/" + inString + ".json", JsonUtility.ToJson(save));
-            returntext = "save your game to : " + Application.persistentDataPath + "/" + inString + ".json";
-        }
-        else
-        {
-            returntext = GameResources._error;
-        }
-        return returntext;
+        SaveGame save = new SaveGame();
+        save.sceneName = SceneManager.GetActiveScene().name;
+        PlayerCharacterController pc = player.GetComponent<PlayerCharacterController>();
+        save.flashlight = pc.flashlight.enabled;
+        save.rotation = player.transform.rotation;
+        save.position = player.transform.position;
+        System.IO.File.WriteAllText(Application.persistentDataPath + "/" + inString + ".json", JsonUtility.ToJson(save));
+        return "saved your game to : " + Application.persistentDataPath + "/" + inString + ".json";
     }
     private string LoadGame(string inString)
     {
@@ -72,7 +63,17 @@ public class CommandLineInterface : MonoBehaviour
         try
         {
             SaveGame save = JsonUtility.FromJson<SaveGame>(System.IO.File.ReadAllText(Application.persistentDataPath + "/" + inString + ".json"));
-            player.transform.position = new Vector3(save.x, save.y, save.z);
+            
+            if (!SceneManager.GetActiveScene().name.Equals(save.sceneName))
+            {
+                GameResources._loadSaveOnStart = inString;
+                SceneManager.LoadScene(save.sceneName, LoadSceneMode.Single);
+            }
+            else
+            {
+                StartCoroutine(LoadScene(inString));
+            }
+
             returntext = "loaded your game from : " + Application.persistentDataPath + "/" + inString + ".json";
         }
         catch (Exception ex) { returntext = GameResources._error + ex.Message; }
@@ -81,9 +82,8 @@ public class CommandLineInterface : MonoBehaviour
     }
     private string TurnLights(string inString)
     {
-
-        if (lights != null) {
-
+        if (lights != null)
+        {
             if (inString.Equals("on"))
             {
                 lights.SetActive(true);
@@ -154,21 +154,35 @@ public class CommandLineInterface : MonoBehaviour
         return helpstring;
     }
     private string Print(string inString) => inString;
+    private IEnumerator LoadScene(string saveName)
+    {
+        SaveGame save = JsonUtility.FromJson<SaveGame>(System.IO.File.ReadAllText(Application.persistentDataPath + "/" + saveName + ".json"));
+
+        if (SceneManager.GetActiveScene().name.Equals(save.sceneName))
+        {
+            if (GameObject.FindWithTag("Player") != null)
+            {
+                GameObject.FindWithTag("Player").transform.position = save.position;
+                PlayerCharacterController pc = GameObject.FindWithTag("Player").GetComponent<PlayerCharacterController>();
+                pc.flashlight.enabled = save.flashlight;
+                GameObject.FindWithTag("Player").transform.rotation = save.rotation;
+                StopCoroutine(LoadScene(saveName));
+            }
+        }
+        yield return new WaitForSeconds(.1f);
+    }
+    private IEnumerator TakeScreenShot()
+    {
+        switchGui(onOff: "off");
+        new WaitForSeconds(.3f);
+        ScreenCapture.CaptureScreenshot(Application.persistentDataPath + "/" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".png");
+        StopCoroutine(TakeScreenShot());
+        yield return new WaitForSeconds(.1f);
+    }
     private string Screenshot(string inString)
     {
-        string msg;
-        switchGui(onOff: "off");
-        try
-        {
-            ScreenCapture.CaptureScreenshot(Application.persistentDataPath + "/" + DateTime.Now + ".png");
-            msg = "Screenshot save to : " + Application.persistentDataPath + "/" + DateTime.Now + ".png";
-        }
-        catch (Exception ex)
-        {
-            msg = "Error" + "\n" + ex.Message;
-        }
-        switchGui(onOff: "on");
-        return msg;
+        StartCoroutine(TakeScreenShot());
+        return "";
     }
     private string QuitGame(string inString)
     {
@@ -229,7 +243,6 @@ public class CommandLineInterface : MonoBehaviour
 
         return "Flashlight Flickering is " + flicker.isFlickering;
     }
-
     private void initCommandList()
     {
         CommandList.Add("credits", Credits);
@@ -246,7 +259,6 @@ public class CommandLineInterface : MonoBehaviour
         CommandList.Add("load", LoadGame);
         CommandList.Add("fps", ShowFPS);
     }
-
     void Update()
     {
         if (Input.GetKeyUp(KeyCode.F1))
@@ -268,7 +280,6 @@ public class CommandLineInterface : MonoBehaviour
             }
         }
     }
-
     private void switchGui(string onOff = null)
     {
         if (onOff != null)
@@ -286,7 +297,7 @@ public class CommandLineInterface : MonoBehaviour
             {
                 player.GetComponent<PlayerCharacterController>().enabled = false;
                 player.GetComponent<PlayerInputHandler>().enabled = false;
-               // player.GetComponent<FlashlightController>().enabled = false;
+                // player.GetComponent<FlashlightController>().enabled = false;
             }
         }
         else
@@ -302,12 +313,17 @@ public class CommandLineInterface : MonoBehaviour
             }
         }
     }
-
     void Start()
     {
+        if (!GameResources._loadSaveOnStart.Equals(""))
+        {
+
+            StartCoroutine(LoadScene(GameResources._loadSaveOnStart));
+            GameResources._loadSaveOnStart = "";
+        }
+
         initCommandList();
     }
-
     private void parseInputCommand(string command)
     {
         string[] cmd = command.ToLower().Split(' ');

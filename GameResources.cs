@@ -1,8 +1,8 @@
-﻿public class GameResources
+﻿public static class GameResources
 {
     public const string _credits = "Unity Technologies - Unity Engine \n Quixel - Megascans \n Microsoft - Visual Studio \n Created by TomScotch@web.de \n Thanks to all my Friends and Family \n special Thanks to all who played this game \n THANK YOU ALL";
     public const string _help_credits = "Show Game Credits";
-    public const string _cmdlist = " - credits \n  - cmdlist \n  - help <name> \n  - quit \n - fps <on/off> \n - start \n  - stop \n - load <name> \n - save <name> \n - screenshot \n  - turnlights <on/off>\n";
+    public const string _cmdlist = " - credits \n  - cmdlist \n  - help <name> \n  - quit \n - fps <on/off> \n - start \n  - stop \n - load <name> \n - save <name> \n - screenshot \n  - turnlights <on/off>\n - flicker <on/off>  \n";
     public const string _help_print = "Print the text to the screen";
     public const string _help_flicker = "Activate Flashlight Flickering ";
     public const string _help_quit = "Quit the Game";
@@ -20,5 +20,6 @@
     public const string _error = "iam sorry i can't do that right now";
     public const string _success = "successfully done";
     public const string _missing = "please provide a parameter";
+    public static string _loadSaveOnStart = "";
     //public const string _ = "";
 }

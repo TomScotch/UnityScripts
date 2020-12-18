@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class SaveGame 
+public class SaveGame
 {
-    public float x;
-    public float y;
-    public float z;
+    public string sceneName;
+    public bool flashlight;
+    public Quaternion rotation;
+    public Vector3 position;
 }
