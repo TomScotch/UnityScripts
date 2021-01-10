@@ -13,7 +13,7 @@ namespace Assets.Scripts
     /// If continuous is true 
     */
 
-    public class RandomActionTrigger : MonoBehaviour
+    public class BloodMoon : MonoBehaviour
     {
         public CommandLineInterface Proc;
 
@@ -48,8 +48,7 @@ namespace Assets.Scripts
 
                 if (Proc != null)
                 {
-                    Proc.Flicker("off");
-                    Proc.TurnLights("on");
+                    Proc.BloodMoon("off");
                 }
 
                 counter = 0.0f;
@@ -70,8 +69,7 @@ namespace Assets.Scripts
             {
                 if (Proc != null)
                 {
-                    Proc.Flicker("on");
-                    Proc.TurnLights("off");
+                    Proc.BloodMoon("on");
                 }
             }
         }

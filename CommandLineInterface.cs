@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -15,7 +16,9 @@ using static ShowFPS;
 public class CommandLineInterface : MonoBehaviour
 {
     Dictionary<string, Procedure> CommandList { get; } = new Dictionary<string, Procedure>();
+
     private delegate string Procedure(string input);
+
     private bool isOn = false;
     public InputField input;
     public TextMeshProUGUI output;
@@ -23,7 +26,96 @@ public class CommandLineInterface : MonoBehaviour
     public FlashLightFlickering flicker;
     public ShowFPS fps;
     public GameObject lights;
+    public AudioSource console;
+    public AudioSource inputReturn;
+    public GameObject button;
+    public Light moon;
+    public Light swamp;
+    private Color MoonColor;
+    private Color SwampColor;
+    public GameObject[] evileyes ;
+    public void menuStartGame()
+    {
+        lights.SetActive(false);
+        if (button != null)
+            button.SetActive(false);
+        SceneManager.LoadSceneAsync("Mansion", LoadSceneMode.Single);
+    }
 
+    public string EvilEyes(string inString)
+    {
+        if (inString.Equals("on"))
+        {
+            foreach (GameObject evileye in evileyes)
+            {
+                evileye.SetActive(true);
+            }
+        }
+        else
+        {
+            foreach (GameObject evileye in evileyes)
+            {
+                evileye.SetActive(false);
+            }
+        }
+        return " EvilEyes are " + inString;
+    }
+
+    public string BloodMoon(string inString)
+    {
+
+        if (inString.Equals("on"))
+        {
+
+            foreach (GameObject evileye in evileyes)
+            {
+                evileye.SetActive(true);
+            }
+
+            moon.color = Color.red;
+            swamp.color = Color.red;
+        }
+        else
+        {
+
+            foreach (GameObject evileye in evileyes)
+            {
+                evileye.SetActive(false);
+            }
+
+            moon.color = MoonColor;
+            swamp.color = SwampColor;
+        }
+        return " BloodMoon is " + inString;
+    }
+    public string Clear(string inString)
+    {
+        return "";
+    }
+    private string ListSaves(string inString)
+    {
+        string returnstring = "";
+
+        try
+        {
+            string[] files = Directory.GetFiles(Application.persistentDataPath + "/");
+            foreach (string file in files)
+            {
+                if (file.Contains(".json"))
+                {
+                    string[] splitfile = file.Split('/');
+                    string filename = splitfile[splitfile.Length - 1].ToString().Replace(".json", "");
+                    returnstring += filename + "\n";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            returnstring = ex.Message;
+        }
+
+        return returnstring;
+    }
     private string ShowFPS(string inString)
     {
         if (inString.Equals("on"))
@@ -47,14 +139,25 @@ public class CommandLineInterface : MonoBehaviour
     }
     private string SaveGame(string inString)
     {
-        SaveGame save = new SaveGame();
-        save.sceneName = SceneManager.GetActiveScene().name;
-        PlayerCharacterController pc = player.GetComponent<PlayerCharacterController>();
-        save.flashlight = pc.flashlight.enabled;
-        save.rotation = player.transform.rotation;
-        save.position = player.transform.position;
-        System.IO.File.WriteAllText(Application.persistentDataPath + "/" + inString + ".json", JsonUtility.ToJson(save));
-        return "saved your game to : " + Application.persistentDataPath + "/" + inString + ".json";
+        string returnstring = "";
+
+        if (player != null)
+        {
+            SaveGame save = new SaveGame();
+            save.sceneName = SceneManager.GetActiveScene().name;
+            PlayerCharacterController pc = player.GetComponent<PlayerCharacterController>();
+            save.flashlight = pc.flashlight.enabled;
+            save.rotation = player.transform.rotation;
+            save.position = player.transform.position;
+            System.IO.File.WriteAllText(Application.persistentDataPath + "/" + inString + ".json", JsonUtility.ToJson(save));
+            returnstring = "saved your game to : " + Application.persistentDataPath + "/" + inString + ".json";
+        }
+        else
+        {
+            returnstring = GameResources._error;
+        }
+
+        return returnstring;
     }
     private string LoadGame(string inString)
     {
@@ -63,7 +166,7 @@ public class CommandLineInterface : MonoBehaviour
         try
         {
             SaveGame save = JsonUtility.FromJson<SaveGame>(System.IO.File.ReadAllText(Application.persistentDataPath + "/" + inString + ".json"));
-            
+
             if (!SceneManager.GetActiveScene().name.Equals(save.sceneName))
             {
                 GameResources._loadSaveOnStart = inString;
@@ -80,7 +183,7 @@ public class CommandLineInterface : MonoBehaviour
 
         return returntext;
     }
-    private string TurnLights(string inString)
+    public string TurnLights(string inString)
     {
         if (lights != null)
         {
@@ -146,6 +249,15 @@ public class CommandLineInterface : MonoBehaviour
             case "fps":
                 helpstring = GameResources._help_fps;
                 break;
+            case "listsaves":
+                helpstring = GameResources._help_listsave;
+                break;
+            case "clear":
+                helpstring = GameResources._help_clear;
+                break;
+            case "evileyes":
+                helpstring = GameResources._help_evileyes;
+                break;
             case "":
                 helpstring = GameResources._help_empty;
                 break;
@@ -193,7 +305,8 @@ public class CommandLineInterface : MonoBehaviour
     public string StartGame(string inString)
     {
         switchGui(onOff: "off");
-        SceneManager.LoadScene("Mansion", LoadSceneMode.Single);
+        menuStartGame();
+        //SceneManager.LoadScene("Mansion", LoadSceneMode.Single);
         return "loaded Mansion";
     }
     private string EndGame(string inString)
@@ -202,7 +315,7 @@ public class CommandLineInterface : MonoBehaviour
         SceneManager.LoadScene("Main", LoadSceneMode.Single);
         return "Returned to Main Menu";
     }
-    private string Flicker(string inString)
+    public string Flicker(string inString)
     {
         if (flicker != null && player != null)
         {
@@ -245,6 +358,7 @@ public class CommandLineInterface : MonoBehaviour
     }
     private void initCommandList()
     {
+        CommandList.Add("clear", Clear);
         CommandList.Add("credits", Credits);
         CommandList.Add("cmdlist", CmdList);
         CommandList.Add("print", Print);
@@ -258,6 +372,9 @@ public class CommandLineInterface : MonoBehaviour
         CommandList.Add("save", SaveGame);
         CommandList.Add("load", LoadGame);
         CommandList.Add("fps", ShowFPS);
+        CommandList.Add("listsaves", ListSaves);
+        CommandList.Add("bloodmoon", BloodMoon);
+        CommandList.Add("evileyes", EvilEyes);
     }
     void Update()
     {
@@ -265,8 +382,9 @@ public class CommandLineInterface : MonoBehaviour
         {
             isOn = !isOn;
             input.text = "";
-            output.text = "";
+
             switchGui();
+            console.Play();
         }
 
         if (isOn)
@@ -277,6 +395,7 @@ public class CommandLineInterface : MonoBehaviour
                 input.text = "";
                 parseInputCommand(s);
                 input.ActivateInputField();
+                inputReturn.Play();
             }
         }
     }
@@ -302,6 +421,7 @@ public class CommandLineInterface : MonoBehaviour
         }
         else
         {
+            output.text = "";
             input.DeactivateInputField();
             input.enabled = false;
             output.enabled = false;
@@ -315,9 +435,21 @@ public class CommandLineInterface : MonoBehaviour
     }
     void Start()
     {
+
+        MoonColor = moon.color;
+        SwampColor = swamp.color;
+
+        evileyes = GameObject.FindGameObjectsWithTag("EvilEyes");
+
+        foreach (GameObject evileye in evileyes)
+        {
+            evileye.SetActive(false);
+        }
+
+        output.text = GameResources._starttip;
+
         if (!GameResources._loadSaveOnStart.Equals(""))
         {
-
             StartCoroutine(LoadScene(GameResources._loadSaveOnStart));
             GameResources._loadSaveOnStart = "";
         }

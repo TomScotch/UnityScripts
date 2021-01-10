@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(CharacterController), typeof(PlayerInputHandler), typeof(AudioSource))]
 public class PlayerCharacterController : MonoBehaviour
@@ -30,7 +31,7 @@ public class PlayerCharacterController : MonoBehaviour
     public float crouchingSharpness = 10f;
 
     public float footstepSFXFrequency = 4f;
-    public float footstepSFXFrequencyWhileSprinting = 3f;
+    public float footstepSFXFrequencyWhileSprinting = 3.3f;
     public AudioClip footstepSFX;
     public AudioClip jumpSFX;
     public AudioClip landSFX;
@@ -55,7 +56,7 @@ public class PlayerCharacterController : MonoBehaviour
             return 1f;
         }
     }
-        
+
     PlayerInputHandler m_InputHandler;
     CharacterController m_Controller;
     Vector3 m_GroundNormal;
@@ -73,6 +74,8 @@ public class PlayerCharacterController : MonoBehaviour
     public AudioSource flashlightOn;
     public AudioSource flashlightOff;
 
+    public Volume vignette;
+
     void Start()
     {
         m_Controller = GetComponent<CharacterController>();
@@ -86,6 +89,44 @@ public class PlayerCharacterController : MonoBehaviour
     void Update()
     {
 
+        if (m_InputHandler.GetAimInputHeld())
+        {
+            if (playerCamera.fieldOfView > 40.3f)
+            {
+                playerCamera.fieldOfView -= 0.3f;
+            }
+        }
+        else
+        {
+            if (playerCamera.fieldOfView < 60.3f)
+            {
+                playerCamera.fieldOfView += 0.3f;
+            }
+        }
+
+        if (vignette != null)
+        {
+            if (isCrouching && vignette.weight < 1)
+            {
+                vignette.weight += 0.01f;
+
+                if (vignette.weight > 1)
+                {
+                    vignette.weight = 1;
+                }
+            }
+
+            if (!isCrouching && vignette.weight > 0.0f)
+            {
+                vignette.weight -= 0.005f;
+
+                if (vignette.weight < 0)
+                {
+                    vignette.weight = 0;
+                }
+            }
+        }
+
         hasJumpedThisFrame = false;
 
         bool wasGrounded = isGrounded;
@@ -98,12 +139,25 @@ public class PlayerCharacterController : MonoBehaviour
             if (recievesFallDamage && fallSpeedRatio > 0f)
             {
 
-               // audioSource.PlayOneShot(fallDamageSFX);
+                // audioSource.PlayOneShot(fallDamageSFX);
             }
             else
             {
-                //audioSource.PlayOneShot(landSFX);
+                audioSource.PlayOneShot(landSFX);
             }
+        }
+
+        if (m_InputHandler.GetFireInputReleased())
+        {
+            if (!flashlight.enabled)
+            {
+                flashlightOff.Play();
+            }
+            else
+            {
+                flashlightOn.Play();
+            }
+            flashlight.enabled = !flashlight.enabled;
         }
 
         if (m_InputHandler.GetCrouchInputDown())
@@ -114,21 +168,6 @@ public class PlayerCharacterController : MonoBehaviour
         UpdateCharacterHeight(false);
 
         HandleCharacterMovement();
-
-        if (Input.GetKeyUp(KeyCode.F))
-        {
-            if (!flashlight.enabled)
-            {
-                flashlightOff.Play();
-
-            }
-            else
-            {
-                flashlightOn.Play();
-            }
-
-            flashlight.enabled = !flashlight.enabled;
-        }
     }
 
     void GroundCheck()
@@ -202,7 +241,7 @@ public class PlayerCharacterController : MonoBehaviour
 
                         characterVelocity += Vector3.up * jumpForce;
 
-                       // audioSource.PlayOneShot(jumpSFX);
+                        audioSource.PlayOneShot(jumpSFX);
 
                         m_LastTimeJumped = Time.time;
                         hasJumpedThisFrame = true;
