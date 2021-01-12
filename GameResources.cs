@@ -1,27 +1,32 @@
 ﻿public static class GameResources
 {
+
+    public const string _levelList = "Main, Mansion, Garden, BookRoom";
+
     // use for loading player data from save after scene change during loading a savegame
     public static string _loadSaveOnStart = "";
 
     // list of the commands available 
     public const string _cmdlist =
-        "- credits \n" +
-        "- clear \n" +
-        "  - cmdlist \n" +
-        "  - help <name> \n" +
-        "  - quit \n" +
-        " - fps <on/off> \n" +
-        " - start \n" +
-        "  - stop \n" +
-        " - load <name> \n" +
-        " - save <name> \n" +
-        " - screenshot \n" +
-        "  - turnlights <on/off>\n" +
-        " - flicker <on/off>  \n" +
-        " - help controls \n" +
-        " - bloodmoon <on/off> \n" +
-        " - evileyes <on/off> \n" +
-        " - listsaves \n";
+        "listscenes \n" +
+        "scene <name> \n" +
+        "credits \n" +
+        "clear \n" +
+        "cmdlist \n" +
+        "help <name> \n" +
+        "quit \n" +
+        "fps <on/off> \n" +
+        "start \n" +
+        "stop \n" +
+        "load <name> \n" +
+        "save <name> \n" +
+        "screenshot \n" +
+        "turnlights <on/off>\n" +
+        "flicker <on/off>  \n" +
+        "help controls \n" +
+        "bloodmoon <on/off> \n" +
+        "evileyes <on/off> \n" +
+        "listsaves \n";
 
     // description of player controls
     public const string _help_controls =
@@ -51,6 +56,8 @@
     public const string _command_input_empty = "Please type help or cmdlist";
 
     // description of command when used with help
+    public const string _help_scene = "loads the scene";
+    public const string _help_listscenes = "list available scenes";
     public const string _help_credits = "Show Game Credits";
     public const string _help_print = "Print the text to the screen";
     public const string _help_flicker = "Activate Flashlight Flickering ";
@@ -70,7 +77,6 @@
     public const string _help_bloodmoon = "turns the moon a bloody red";
     public const string _help_evileyes = "activate evil eyes for statues";
     public const string _help_zoom = "brings your sight closer to the scene";
-    //public const string _ = "";
 
     // CHECKLIST FOR TESTING    
     public const string _help_checklist =
@@ -106,8 +112,10 @@
         "Active Console disables player controls \n" +
         "Bloodmoon \n" +
         "Evil Eyes \n" +
+        "listscenes \n" +
+        "scene \n" +
         "Main Scene loads Mansion Smoothly \n" +
-        "Cli help -> cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot,clear,zoom \n" +
-        "Cli cmd main -> cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot, clear \n" +
-        "Cli error -> error, success, fail -> cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot, clear \n";
+        "Cli help -> listscenes, scene, cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot,clear,zoom \n" +
+        "Cli cmd main -> listscenes, scene, cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot, clear \n" +
+        "Cli error -> error, success, fail -> listscenes, scene, cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot, clear \n";
 }

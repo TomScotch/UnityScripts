@@ -35,12 +35,21 @@ public class CommandLineInterface : MonoBehaviour
     private Color SwampColor;
     public GameObject[] evileyes;
 
-    public void menuStartGame()
+    public string ListScenes(string inString) => GameResources._levelList;
+
+    public string StartScene(string name = "")
     {
-        lights.SetActive(false);
-        if (button != null)
-            button.SetActive(false);
-        SceneManager.LoadSceneAsync("Mansion", LoadSceneMode.Single);
+        if (GameResources._levelList.Contains(name))
+        {
+            if (button != null && lights != null)
+            {
+                button.SetActive(false);
+                lights.SetActive(false);
+            }
+            SceneManager.LoadSceneAsync(name, LoadSceneMode.Single);
+        }
+
+        return "loading Scene : " + name;
     }
     public string EvilEyes(string inString)
     {
@@ -263,6 +272,12 @@ public class CommandLineInterface : MonoBehaviour
             case "zoom":
                 helpstring = GameResources._help_zoom;
                 break;
+            case "scene":
+                helpstring = GameResources._help_scene;
+                break;
+            case "listscenes":
+                helpstring = GameResources._help_listscenes;
+                break;
             case "":
                 helpstring = GameResources._help_empty;
                 break;
@@ -310,14 +325,13 @@ public class CommandLineInterface : MonoBehaviour
     public string StartGame(string inString)
     {
         switchGui(onOff: "off");
-        menuStartGame();
-        //SceneManager.LoadScene("Mansion", LoadSceneMode.Single);
+        StartScene("Mansion");
         return "loaded Mansion";
     }
     private string EndGame(string inString)
     {
         switchGui(onOff: "off");
-        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        StartScene("Main");
         return "Returned to Main Menu";
     }
     public string Flicker(string inString)
@@ -380,6 +394,8 @@ public class CommandLineInterface : MonoBehaviour
         CommandList.Add("listsaves", ListSaves);
         CommandList.Add("bloodmoon", BloodMoon);
         CommandList.Add("evileyes", EvilEyes);
+        CommandList.Add("scene", StartScene);
+        CommandList.Add("listscenes", ListScenes);
     }
     void Update()
     {
