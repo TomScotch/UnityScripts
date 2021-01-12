@@ -33,7 +33,8 @@ public class CommandLineInterface : MonoBehaviour
     public Light swamp;
     private Color MoonColor;
     private Color SwampColor;
-    public GameObject[] evileyes ;
+    public GameObject[] evileyes;
+
     public void menuStartGame()
     {
         lights.SetActive(false);
@@ -41,7 +42,6 @@ public class CommandLineInterface : MonoBehaviour
             button.SetActive(false);
         SceneManager.LoadSceneAsync("Mansion", LoadSceneMode.Single);
     }
-
     public string EvilEyes(string inString)
     {
         if (inString.Equals("on"))
@@ -60,7 +60,6 @@ public class CommandLineInterface : MonoBehaviour
         }
         return " EvilEyes are " + inString;
     }
-
     public string BloodMoon(string inString)
     {
 
@@ -257,6 +256,12 @@ public class CommandLineInterface : MonoBehaviour
                 break;
             case "evileyes":
                 helpstring = GameResources._help_evileyes;
+                break;
+            case "checklist":
+                helpstring = GameResources._help_checklist;
+                break;
+            case "zoom":
+                helpstring = GameResources._help_zoom;
                 break;
             case "":
                 helpstring = GameResources._help_empty;

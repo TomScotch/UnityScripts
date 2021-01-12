@@ -4,7 +4,7 @@
     public static string _loadSaveOnStart = "";
 
     // list of the commands available 
-    public const string _cmdlist = 
+    public const string _cmdlist =
         "- credits \n" +
         "- clear \n" +
         "  - cmdlist \n" +
@@ -25,13 +25,14 @@
 
     // description of player controls
     public const string _help_controls =
-        "Use mouse to look around \n" +
+        " Move mouse to look around \n" +
         " F1 - OpenConsole \n" +
         " WASD - Forward,Back,Left,Right \n" +
         " Space - Jump \n" +
         " Shift - Run \n" +
         " C - Crouch \n" +
-        " F - Flashlight \n";
+        " F - Flashlight \n" +
+        " RightMouse - Zoom \n";
 
     // credits
     public const string _credits =
@@ -68,5 +69,45 @@
     public const string _starttip = "type cmdlist for a list of commands";
     public const string _help_bloodmoon = "turns the moon a bloody red";
     public const string _help_evileyes = "activate evil eyes for statues";
+    public const string _help_zoom = "brings your sight closer to the scene";
     //public const string _ = "";
+
+    // CHECKLIST FOR TESTING    
+    public const string _help_checklist =
+        "Hide Cursor \n" +
+        "Fade In \n" +
+        "Lightning Strike \n" +
+        "Fog \n" +
+        "Statues Heads Move \n" +
+        "Toy Box on the Floor Jumps up \n" +
+        "Box on the Table with Mirror Jumps Up \n" +
+        "Flashlight \n" +
+        "Crow Scream \n" +
+        "Lights go crazy and flashlight turns off and on \n" +
+        "Scary Sound on the end of the Stairs \n" +
+        "Flashlight Won't cast Shadows when Camera is close to wall \n" +
+        "Footsteps Sound & Sound when Running \n" +
+        "Jump, Crouch, Flashlight, Zoom, Sprint, Console \n" +
+        "Scary Whispers on the Second Floor \n" +
+        "Second floor Adler flews from wall \n" +
+        "Second floor Girl Screams \n" +
+        "Second floor Water Drops \n" +
+        "Candles and Fireplaces are Flickering \n" +
+        "Vignette effect when crouching \n" +
+        "Wind howls at the start point \n" +
+        "Volumetric Lights \n" +
+        "Shadows \n" +
+        "Mirror First Floor \n" +
+        "Moon \n" +
+        "Collisions \n" +
+        "Sounds for console, bgm, events, jumping, landing \n" +
+        "Zoom \n" +
+        "Cli Tooltip \n" +
+        "Active Console disables player controls \n" +
+        "Bloodmoon \n" +
+        "Evil Eyes \n" +
+        "Main Scene loads Mansion Smoothly \n" +
+        "Cli help -> cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot,clear,zoom \n" +
+        "Cli cmd main -> cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot, clear \n" +
+        "Cli error -> error, success, fail -> cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot, clear \n";
 }
