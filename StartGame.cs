@@ -41,7 +41,7 @@ public class StartGame : MonoBehaviour
             lights.SetActive(false);
             button.SetActive(false);
             this.enabled = false;
-            SceneManager.LoadSceneAsync("Mansion", LoadSceneMode.Single);
+            SceneManager.LoadSceneAsync("mansion", LoadSceneMode.Single);
         }
     }
 }

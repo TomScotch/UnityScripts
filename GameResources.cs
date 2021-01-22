@@ -1,7 +1,7 @@
 ﻿public static class GameResources
 {
 
-    public const string _levelList = "Main, Mansion, Garden, BookRoom";
+    public const string _levelList = "main, mansion, garden, bookroom";
 
     // use for loading player data from save after scene change during loading a savegame
     public static string _loadSaveOnStart = "";
@@ -24,8 +24,10 @@
         "turnlights <on/off>\n" +
         "flicker <on/off>  \n" +
         "help controls \n" +
+        "help checklist \n" +
         "bloodmoon <on/off> \n" +
         "evileyes <on/off> \n" +
+        "intro \n" +
         "listsaves \n";
 
     // description of player controls
@@ -77,45 +79,33 @@
     public const string _help_bloodmoon = "turns the moon a bloody red";
     public const string _help_evileyes = "activate evil eyes for statues";
     public const string _help_zoom = "brings your sight closer to the scene";
+    public const string _help_intro = "Read the Game Introduction";
 
     // CHECKLIST FOR TESTING    
-    public const string _help_checklist =
-        "Hide Cursor \n" +
-        "Fade In \n" +
-        "Lightning Strike \n" +
-        "Fog \n" +
-        "Statues Heads Move \n" +
-        "Toy Box on the Floor Jumps up \n" +
-        "Box on the Table with Mirror Jumps Up \n" +
-        "Flashlight \n" +
-        "Crow Scream \n" +
+    public const string checklist =
+        "Hide Cursor - Fade In - Lightning Strike - Fog - Statues Heads Move \n" +
+        "Toy Box on the Floor Jumps up - Cli help  - Cli cmd main - Cli error \n" +
+        "Box on the Table with Mirror Jumps Up Flashlight Crow Scream \n" +
         "Lights go crazy and flashlight turns off and on \n" +
-        "Scary Sound on the end of the Stairs \n" +
         "Flashlight Won't cast Shadows when Camera is close to wall \n" +
-        "Footsteps Sound & Sound when Running \n" +
-        "Jump, Crouch, Flashlight, Zoom, Sprint, Console \n" +
-        "Scary Whispers on the Second Floor \n" +
-        "Second floor Adler flews from wall \n" +
-        "Second floor Girl Screams \n" +
-        "Second floor Water Drops \n" +
-        "Candles and Fireplaces are Flickering \n" +
-        "Vignette effect when crouching \n" +
-        "Wind howls at the start point \n" +
-        "Volumetric Lights \n" +
-        "Shadows \n" +
-        "Mirror First Floor \n" +
-        "Moon \n" +
-        "Collisions \n" +
-        "Sounds for console, bgm, events, jumping, landing \n" +
-        "Zoom \n" +
-        "Cli Tooltip \n" +
-        "Active Console disables player controls \n" +
-        "Bloodmoon \n" +
-        "Evil Eyes \n" +
-        "listscenes \n" +
-        "scene \n" +
-        "Main Scene loads Mansion Smoothly \n" +
-        "Cli help -> listscenes, scene, cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot,clear,zoom \n" +
-        "Cli cmd main -> listscenes, scene, cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot, clear \n" +
-        "Cli error -> error, success, fail -> listscenes, scene, cmdlist, listsaves, save, load, begin, end, quit, clear, flicker, fps, turnights, credits, help controls, screenshot, clear \n";
+        "Scary Sound on top of Stairs - Footsteps Sound & Sound when Running \n" +
+        "Jump, Crouch, Flashlight, Zoom, Sprint, Console - listscenes - scene\n" +
+        "Vignette on crouching - Scary Whispers on the Second Floor \n" +
+        "Second floor Adler flews from wall - Girl Scream - Sound of Water Drops \n" +
+        "Wind howls at the start point - Volumetric Lights - Bloodmoon \n" +
+        "Lights are Flickering - Moon - Collisions - Shadows - Mirror First Floor \n" +
+        "Sounds for console, bgm, events, jumping, landing -Evil Eyes \n" +
+        "Zoom - Cli Tooltip - Active Console disables player controls \n" +
+        "Main Scene loads Mansion Smoothly - Load all Scenes \n";
+
+
+
+    public const string GameIntro =
+        "Your Sanity decreases on witnessing paranormal events.\n" + 
+        "Using the Mystic Arts will drain your Willpower. \n" +
+        "Willpower defines how much sanity you recover.\n" +
+        "Sleep replenishes your Willpower, at the cost of time. \n" +
+        "The Butterflies are drawn by your willpower. \n" +
+        "Pictures marked by Blood are Doors, focus on them.\n " +
+        "You have Seven Days for your Journey Good Luck.";
 }

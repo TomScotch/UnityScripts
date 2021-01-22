@@ -13,6 +13,7 @@ public class FlashLightFlickering : MonoBehaviour
     public Light flashlight;
 
     private Coroutine coroutine;
+    private const float intensity = 3.88f;
 
     public void begin()
     {
@@ -27,6 +28,7 @@ public class FlashLightFlickering : MonoBehaviour
         if (isFlickering)
         {
             isFlickering = false;
+            flashlight.intensity = intensity;
             StopCoroutine(coroutine);
         }
     }
@@ -35,7 +37,19 @@ public class FlashLightFlickering : MonoBehaviour
     {
         while (true)
         {
-            flashlight.enabled = !flashlight.enabled;
+            if (flashlight.enabled)
+            {
+
+                if(flashlight.intensity == 3.88f)
+                {
+                    flashlight.intensity = 0f;
+                }
+                else
+                {
+                    flashlight.intensity = intensity;
+                }
+
+            }
             yield return new WaitForSeconds(Random.Range(0.3f, 1.2f));
         }
     }

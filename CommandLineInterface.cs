@@ -36,9 +36,18 @@ public class CommandLineInterface : MonoBehaviour
     public GameObject[] evileyes;
 
     public string ListScenes(string inString) => GameResources._levelList;
-
+    public string Intro(string inString) => GameResources.GameIntro;
+    private string Print(string inString) => inString;
+    public string Clear(string inString) => "";
     public string StartScene(string name = "")
     {
+        string returnString = "";
+
+        if (name.Equals(""))
+        {
+            name = "Main";
+        }
+
         if (GameResources._levelList.Contains(name))
         {
             if (button != null && lights != null)
@@ -46,10 +55,14 @@ public class CommandLineInterface : MonoBehaviour
                 button.SetActive(false);
                 lights.SetActive(false);
             }
+            returnString = "loading Scene : " + name;
             SceneManager.LoadSceneAsync(name, LoadSceneMode.Single);
+        }else
+        {
+            returnString = "can't find a Scene with that name : " + name;
         }
 
-        return "loading Scene : " + name;
+        return returnString;
     }
     public string EvilEyes(string inString)
     {
@@ -69,6 +82,35 @@ public class CommandLineInterface : MonoBehaviour
         }
         return " EvilEyes are " + inString;
     }
+   
+    private IEnumerator MakeBloody()
+    {
+        moon.color = new Color(moon.color.r + ( 3 / Time.deltaTime), moon.color.g, moon.color.b, moon.color.a);
+        swamp.color = new Color(swamp.color.r + (3 / Time.deltaTime), swamp.color.g, swamp.color.b, swamp.color.a);
+
+        if (moon.color.r >= 255 && swamp.color.r >= 255)
+        {
+            StopCoroutine(MakeBloody());
+        }
+        
+        yield return new WaitForSeconds(.1f);
+    }
+
+    private IEnumerator MakeBloodyNot()
+    {
+        moon.color = new Color(moon.color.r - (3 / Time.deltaTime), moon.color.g, moon.color.b, moon.color.a);
+        swamp.color = new Color(swamp.color.r - (3 / Time.deltaTime), swamp.color.g, swamp.color.b, swamp.color.a);
+
+        if (moon.color.r <= MoonColor.r && swamp.color.r <= SwampColor.r)
+        {
+            moon.color = MoonColor;
+            swamp.color = SwampColor;
+            StopCoroutine(MakeBloodyNot());
+        }
+
+        yield return new WaitForSeconds(.1f);
+    }
+
     public string BloodMoon(string inString)
     {
 
@@ -80,8 +122,7 @@ public class CommandLineInterface : MonoBehaviour
                 evileye.SetActive(true);
             }
 
-            moon.color = Color.red;
-            swamp.color = Color.red;
+            StartCoroutine(MakeBloody());
         }
         else
         {
@@ -91,14 +132,9 @@ public class CommandLineInterface : MonoBehaviour
                 evileye.SetActive(false);
             }
 
-            moon.color = MoonColor;
-            swamp.color = SwampColor;
+            StartCoroutine(MakeBloodyNot());
         }
         return " BloodMoon is " + inString;
-    }
-    public string Clear(string inString)
-    {
-        return "";
     }
     private string ListSaves(string inString)
     {
@@ -178,7 +214,7 @@ public class CommandLineInterface : MonoBehaviour
             if (!SceneManager.GetActiveScene().name.Equals(save.sceneName))
             {
                 GameResources._loadSaveOnStart = inString;
-                SceneManager.LoadScene(save.sceneName, LoadSceneMode.Single);
+                StartScene(save.sceneName);
             }
             else
             {
@@ -267,7 +303,7 @@ public class CommandLineInterface : MonoBehaviour
                 helpstring = GameResources._help_evileyes;
                 break;
             case "checklist":
-                helpstring = GameResources._help_checklist;
+                helpstring = GameResources.checklist;
                 break;
             case "zoom":
                 helpstring = GameResources._help_zoom;
@@ -278,6 +314,9 @@ public class CommandLineInterface : MonoBehaviour
             case "listscenes":
                 helpstring = GameResources._help_listscenes;
                 break;
+            case "intro":
+                helpstring = GameResources._help_intro;
+                break;
             case "":
                 helpstring = GameResources._help_empty;
                 break;
@@ -285,7 +324,6 @@ public class CommandLineInterface : MonoBehaviour
 
         return helpstring;
     }
-    private string Print(string inString) => inString;
     private IEnumerator LoadScene(string saveName)
     {
         SaveGame save = JsonUtility.FromJson<SaveGame>(System.IO.File.ReadAllText(Application.persistentDataPath + "/" + saveName + ".json"));
@@ -325,13 +363,13 @@ public class CommandLineInterface : MonoBehaviour
     public string StartGame(string inString)
     {
         switchGui(onOff: "off");
-        StartScene("Mansion");
-        return "loaded Mansion";
+        StartScene("mansion");
+        return "loaded mansion";
     }
     private string EndGame(string inString)
     {
         switchGui(onOff: "off");
-        StartScene("Main");
+        StartScene("main");
         return "Returned to Main Menu";
     }
     public string Flicker(string inString)
@@ -396,6 +434,7 @@ public class CommandLineInterface : MonoBehaviour
         CommandList.Add("evileyes", EvilEyes);
         CommandList.Add("scene", StartScene);
         CommandList.Add("listscenes", ListScenes);
+        CommandList.Add("intro", Intro);
     }
     void Update()
     {
