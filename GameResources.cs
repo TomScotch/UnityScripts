@@ -80,6 +80,7 @@
     public const string _help_evileyes = "activate evil eyes for statues";
     public const string _help_zoom = "brings your sight closer to the scene";
     public const string _help_intro = "Read the Game Introduction";
+    public const string _help_checklist= "Game Dev Feature Checklist";
 
     // CHECKLIST FOR TESTING    
     public const string checklist =

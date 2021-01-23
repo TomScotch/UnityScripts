@@ -33,12 +33,13 @@ public class CommandLineInterface : MonoBehaviour
     public Light swamp;
     private Color MoonColor;
     private Color SwampColor;
-    public GameObject[] evileyes;
+    private GameObject[] evileyes;
 
     public string ListScenes(string inString) => GameResources._levelList;
     public string Intro(string inString) => GameResources.GameIntro;
     private string Print(string inString) => inString;
     public string Clear(string inString) => "";
+    public string Checklist(string inString) => GameResources.checklist;
     public string StartScene(string name = "")
     {
         string returnString = "";
@@ -165,13 +166,15 @@ public class CommandLineInterface : MonoBehaviour
         if (inString.Equals("on"))
         {
             fps.enabled = true;
-        }
-        else
+        } else if (inString.Equals("off"))
         {
             fps.enabled = false;
+        } else if (inString.Equals(""))
+        {
+            inString = fps.enabled.ToString();
         }
 
-        return "fps counter is : " + inString;
+        return "fps is : " + inString;
     }
     private string Credits(string inString)
     {
@@ -303,7 +306,7 @@ public class CommandLineInterface : MonoBehaviour
                 helpstring = GameResources._help_evileyes;
                 break;
             case "checklist":
-                helpstring = GameResources.checklist;
+                helpstring = GameResources._help_checklist;
                 break;
             case "zoom":
                 helpstring = GameResources._help_zoom;
@@ -435,6 +438,7 @@ public class CommandLineInterface : MonoBehaviour
         CommandList.Add("scene", StartScene);
         CommandList.Add("listscenes", ListScenes);
         CommandList.Add("intro", Intro);
+        CommandList.Add("checklist", Checklist);
     }
     void Update()
     {
