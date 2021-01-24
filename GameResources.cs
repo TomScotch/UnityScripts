@@ -23,8 +23,8 @@
         "screenshot \n" +
         "turnlights <on/off>\n" +
         "flicker <on/off>  \n" +
-        "help controls \n" +
-        "help checklist \n" +
+        "controls \n" +
+        "checklist \n" +
         "bloodmoon <on/off> \n" +
         "evileyes <on/off> \n" +
         "intro \n" +

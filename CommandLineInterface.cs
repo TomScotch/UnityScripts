@@ -18,8 +18,12 @@ public class CommandLineInterface : MonoBehaviour
     Dictionary<string, Procedure> CommandList { get; } = new Dictionary<string, Procedure>();
 
     private delegate string Procedure(string input);
-
+    private bool isBloodMoon = false;
     private bool isOn = false;
+    private Color MoonColor;
+    private Color SwampColor;
+    private GameObject[] evileyes;
+
     public InputField input;
     public TextMeshProUGUI output;
     public GameObject player;
@@ -31,15 +35,79 @@ public class CommandLineInterface : MonoBehaviour
     public GameObject button;
     public Light moon;
     public Light swamp;
-    private Color MoonColor;
-    private Color SwampColor;
-    private GameObject[] evileyes;
+    private List<string> history = new List<string>();
+    private int history_cursor = 0;
+
+    private IEnumerator MakeBloody()
+    {
+
+        float moonRed = moon.color.r + (0.03f / Time.deltaTime);
+        float swampRed = swamp.color.r + (0.03f / Time.deltaTime);
+
+        moon.color = new Color(moonRed, MoonColor.g, MoonColor.b, MoonColor.a);
+        swamp.color = new Color(swampRed, SwampColor.g, SwampColor.b, SwampColor.a);
+
+        if (swampRed >= 64f || moonRed >= 64f)
+        {
+            StopCoroutine(MakeBloody());
+        }
+
+        yield return new WaitForSeconds(.1f);
+    }
+    private IEnumerator MakeBloodyNot()
+    {
+        float moonRed = moon.color.r - (0.9f / Time.deltaTime);
+        float swampRed = swamp.color.r - (0.9f / Time.deltaTime);
+
+        moon.color = new Color(moonRed, MoonColor.g, MoonColor.b, MoonColor.a);
+        swamp.color = new Color(swampRed, SwampColor.g, SwampColor.b, SwampColor.a);
+
+        if (swampRed <= SwampColor.r || moonRed <= MoonColor.r)
+        {
+            moon.color = MoonColor;
+            swamp.color = SwampColor;
+            StopCoroutine(MakeBloodyNot());
+        }
+
+        yield return new WaitForSeconds(.1f);
+    }
+    private IEnumerator LoadScene(string saveName)
+    {
+        SaveGame save = JsonUtility.FromJson<SaveGame>(System.IO.File.ReadAllText(Application.persistentDataPath + "/" + saveName + ".json"));
+
+        if (SceneManager.GetActiveScene().name.Equals(save.sceneName))
+        {
+            if (GameObject.FindWithTag("Player") != null)
+            {
+                GameObject.FindWithTag("Player").transform.position = save.position;
+                PlayerCharacterController pc = GameObject.FindWithTag("Player").GetComponent<PlayerCharacterController>();
+                pc.flashlight.enabled = save.flashlight;
+                GameObject.FindWithTag("Player").transform.rotation = save.rotation;
+                StopCoroutine(LoadScene(saveName));
+            }
+        }
+        yield return new WaitForSeconds(.1f);
+    }
+    private IEnumerator TakeScreenShot()
+    {
+        switchGui(onOff: "off");
+        new WaitForSeconds(.3f);
+        ScreenCapture.CaptureScreenshot(Application.persistentDataPath + "/" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".png");
+        StopCoroutine(TakeScreenShot());
+        yield return new WaitForSeconds(.1f);
+    }
+
 
     public string ListScenes(string inString) => GameResources._levelList;
     public string Intro(string inString) => GameResources.GameIntro;
-    private string Print(string inString) => inString;
-    public string Clear(string inString) => "";
     public string Checklist(string inString) => GameResources.checklist;
+    public string Clear(string inString) => "";
+
+    private string Print(string inString) => inString;
+    private string CmdList(string inString) => GameResources._cmdlist;
+    private string Credits(string inString) => GameResources._credits;
+
+
     public string StartScene(string name = "")
     {
         string returnString = "";
@@ -58,7 +126,8 @@ public class CommandLineInterface : MonoBehaviour
             }
             returnString = "loading Scene : " + name;
             SceneManager.LoadSceneAsync(name, LoadSceneMode.Single);
-        }else
+        }
+        else
         {
             returnString = "can't find a Scene with that name : " + name;
         }
@@ -83,49 +152,20 @@ public class CommandLineInterface : MonoBehaviour
         }
         return " EvilEyes are " + inString;
     }
-   
-    private IEnumerator MakeBloody()
-    {
-        moon.color = new Color(moon.color.r + ( 3 / Time.deltaTime), moon.color.g, moon.color.b, moon.color.a);
-        swamp.color = new Color(swamp.color.r + (3 / Time.deltaTime), swamp.color.g, swamp.color.b, swamp.color.a);
-
-        if (moon.color.r >= 255 && swamp.color.r >= 255)
-        {
-            StopCoroutine(MakeBloody());
-        }
-        
-        yield return new WaitForSeconds(.1f);
-    }
-
-    private IEnumerator MakeBloodyNot()
-    {
-        moon.color = new Color(moon.color.r - (3 / Time.deltaTime), moon.color.g, moon.color.b, moon.color.a);
-        swamp.color = new Color(swamp.color.r - (3 / Time.deltaTime), swamp.color.g, swamp.color.b, swamp.color.a);
-
-        if (moon.color.r <= MoonColor.r && swamp.color.r <= SwampColor.r)
-        {
-            moon.color = MoonColor;
-            swamp.color = SwampColor;
-            StopCoroutine(MakeBloodyNot());
-        }
-
-        yield return new WaitForSeconds(.1f);
-    }
-
     public string BloodMoon(string inString)
     {
 
-        if (inString.Equals("on"))
+        if (inString.Equals("on") && !isBloodMoon)
         {
-
             foreach (GameObject evileye in evileyes)
             {
                 evileye.SetActive(true);
             }
 
             StartCoroutine(MakeBloody());
+            isBloodMoon = true;
         }
-        else
+        else if (inString.Equals("off") && isBloodMoon)
         {
 
             foreach (GameObject evileye in evileyes)
@@ -134,6 +174,11 @@ public class CommandLineInterface : MonoBehaviour
             }
 
             StartCoroutine(MakeBloodyNot());
+            isBloodMoon = false;
+        }
+        else if (inString.Equals(""))
+        {
+            inString = isBloodMoon.ToString();
         }
         return " BloodMoon is " + inString;
     }
@@ -166,23 +211,17 @@ public class CommandLineInterface : MonoBehaviour
         if (inString.Equals("on"))
         {
             fps.enabled = true;
-        } else if (inString.Equals("off"))
+        }
+        else if (inString.Equals("off"))
         {
             fps.enabled = false;
-        } else if (inString.Equals(""))
+        }
+        else if (inString.Equals(""))
         {
             inString = fps.enabled.ToString();
         }
 
         return "fps is : " + inString;
-    }
-    private string Credits(string inString)
-    {
-        return GameResources._credits;
-    }
-    private string CmdList(string inString)
-    {
-        return GameResources._cmdlist;
     }
     private string SaveGame(string inString)
     {
@@ -327,31 +366,8 @@ public class CommandLineInterface : MonoBehaviour
 
         return helpstring;
     }
-    private IEnumerator LoadScene(string saveName)
-    {
-        SaveGame save = JsonUtility.FromJson<SaveGame>(System.IO.File.ReadAllText(Application.persistentDataPath + "/" + saveName + ".json"));
 
-        if (SceneManager.GetActiveScene().name.Equals(save.sceneName))
-        {
-            if (GameObject.FindWithTag("Player") != null)
-            {
-                GameObject.FindWithTag("Player").transform.position = save.position;
-                PlayerCharacterController pc = GameObject.FindWithTag("Player").GetComponent<PlayerCharacterController>();
-                pc.flashlight.enabled = save.flashlight;
-                GameObject.FindWithTag("Player").transform.rotation = save.rotation;
-                StopCoroutine(LoadScene(saveName));
-            }
-        }
-        yield return new WaitForSeconds(.1f);
-    }
-    private IEnumerator TakeScreenShot()
-    {
-        switchGui(onOff: "off");
-        new WaitForSeconds(.3f);
-        ScreenCapture.CaptureScreenshot(Application.persistentDataPath + "/" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".png");
-        StopCoroutine(TakeScreenShot());
-        yield return new WaitForSeconds(.1f);
-    }
+
     private string Screenshot(string inString)
     {
         StartCoroutine(TakeScreenShot());
@@ -416,6 +432,8 @@ public class CommandLineInterface : MonoBehaviour
 
         return "Flashlight Flickering is " + flicker.isFlickering;
     }
+    
+
     private void initCommandList()
     {
         CommandList.Add("clear", Clear);
@@ -442,6 +460,26 @@ public class CommandLineInterface : MonoBehaviour
     }
     void Update()
     {
+
+        if (Input.GetKeyUp(KeyCode.UpArrow))
+        {
+            if ((history_cursor + 1) < history.Count )
+            {
+                history_cursor += 1;
+                input.text = history[history_cursor];
+            }
+        }
+
+        if (Input.GetKeyUp(KeyCode.DownArrow))
+        {
+            if((history_cursor - 1) >= 1)
+            {
+                history_cursor -= 1;
+                input.text = history[history_cursor];
+            }
+            
+        }
+        
         if (Input.GetKeyUp(KeyCode.F1))
         {
             isOn = !isOn;
@@ -527,11 +565,13 @@ public class CommandLineInterface : MonoBehaviour
         if (cmd.Length > 1 && CommandList.ContainsKey(cmd[0]))
         {
             output.text = CommandList[cmd[0]].Invoke(cmd[1]);
+            history.Add(cmd[0]+" "+ cmd[1]);
         }
 
         if (cmd.Length == 1 && CommandList.ContainsKey(cmd[0]))
         {
             output.text = CommandList[cmd[0]].Invoke("");
+            history.Add(cmd[0]);
         }
 
         if (cmd[0].Equals(""))

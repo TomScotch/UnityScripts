@@ -13,10 +13,12 @@ public class FlashLightFlickering : MonoBehaviour
     public Light flashlight;
 
     private Coroutine coroutine;
-    private const float intensity = 3.88f;
+    private float intensity;
 
     public void begin()
     {
+        intensity = flashlight.intensity;
+
         if (!isFlickering)
         {
             isFlickering = true;
@@ -40,7 +42,7 @@ public class FlashLightFlickering : MonoBehaviour
             if (flashlight.enabled)
             {
 
-                if(flashlight.intensity == 3.88f)
+                if(flashlight.intensity == intensity)
                 {
                     flashlight.intensity = 0f;
                 }
