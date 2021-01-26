@@ -106,6 +106,14 @@ public class PlayerInputHandler : MonoBehaviour {
         return false;
     }
 
+    public bool GetFlashlightInputDown()
+    {
+        if (CanProcessInput())
+        {
+            return Input.GetButtonDown(GameConstants.k_ButtonNameFlashlight);
+        }
+        return false;
+    }
     public bool GetCrouchInputReleased () {
         if (CanProcessInput ()) {
             return Input.GetButtonUp (GameConstants.k_ButtonNameCrouch);

@@ -147,7 +147,7 @@ public class PlayerCharacterController : MonoBehaviour
             }
         }
 
-        if (m_InputHandler.GetFireInputReleased())
+        if (m_InputHandler.GetFlashlightInputDown())
         {
             if (!flashlight.enabled)
             {
@@ -255,7 +255,7 @@ public class PlayerCharacterController : MonoBehaviour
                 if (m_footstepDistanceCounter >= 3f / chosenFootstepSFXFrequency)
                 {
                     m_footstepDistanceCounter = 0f;
-                    audioSource.PlayOneShot(footstepSFX);
+                    audioSource.PlayOneShot(footstepSFX, 0.40f);
                 }
 
                 m_footstepDistanceCounter += characterVelocity.magnitude * Time.deltaTime;

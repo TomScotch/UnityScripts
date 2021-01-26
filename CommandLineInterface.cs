@@ -114,10 +114,9 @@ public class CommandLineInterface : MonoBehaviour
 
         if (name.Equals(""))
         {
-            name = "Main";
+            returnString = SceneManager.GetActiveScene().name.ToString();
         }
-
-        if (GameResources._levelList.Contains(name))
+        else if (GameResources._levelList.Contains(name))
         {
             if (button != null && lights != null)
             {
@@ -129,7 +128,7 @@ public class CommandLineInterface : MonoBehaviour
         }
         else
         {
-            returnString = "can't find a Scene with that name : " + name;
+            returnString = GameResources._scene_missing + name;
         }
 
         return returnString;
@@ -143,13 +142,18 @@ public class CommandLineInterface : MonoBehaviour
                 evileye.SetActive(true);
             }
         }
-        else
+        else if (inString.Equals("off"))
         {
             foreach (GameObject evileye in evileyes)
             {
                 evileye.SetActive(false);
             }
         }
+        else if (inString.Equals(""))
+        {
+            inString = evileyes[0].activeSelf.ToString();
+        }
+        else { return GameResources._error; }
         return " EvilEyes are " + inString;
     }
     public string BloodMoon(string inString)
@@ -167,7 +171,6 @@ public class CommandLineInterface : MonoBehaviour
         }
         else if (inString.Equals("off") && isBloodMoon)
         {
-
             foreach (GameObject evileye in evileyes)
             {
                 evileye.SetActive(false);
@@ -180,6 +183,7 @@ public class CommandLineInterface : MonoBehaviour
         {
             inString = isBloodMoon.ToString();
         }
+        else { return GameResources._error; }
         return " BloodMoon is " + inString;
     }
     private string ListSaves(string inString)
@@ -220,7 +224,7 @@ public class CommandLineInterface : MonoBehaviour
         {
             inString = fps.enabled.ToString();
         }
-
+        else { return GameResources._error; }
         return "fps is : " + inString;
     }
     private string SaveGame(string inString)
@@ -229,14 +233,20 @@ public class CommandLineInterface : MonoBehaviour
 
         if (player != null)
         {
-            SaveGame save = new SaveGame();
-            save.sceneName = SceneManager.GetActiveScene().name;
-            PlayerCharacterController pc = player.GetComponent<PlayerCharacterController>();
-            save.flashlight = pc.flashlight.enabled;
-            save.rotation = player.transform.rotation;
-            save.position = player.transform.position;
-            System.IO.File.WriteAllText(Application.persistentDataPath + "/" + inString + ".json", JsonUtility.ToJson(save));
-            returnstring = "saved your game to : " + Application.persistentDataPath + "/" + inString + ".json";
+            if (!inString.Equals(""))
+            {
+                SaveGame save = new SaveGame();
+                save.sceneName = SceneManager.GetActiveScene().name;
+                PlayerCharacterController pc = player.GetComponent<PlayerCharacterController>();
+                save.flashlight = pc.flashlight.enabled;
+                save.rotation = player.transform.rotation;
+                save.position = player.transform.position;
+                System.IO.File.WriteAllText(Application.persistentDataPath + "/" + inString + ".json", JsonUtility.ToJson(save));
+                returnstring = "saved your game to : " + Application.persistentDataPath + "/" + inString + ".json";
+            }else
+            {
+                returnstring = GameResources._missingSaveName;
+            }
         }
         else
         {
@@ -248,24 +258,29 @@ public class CommandLineInterface : MonoBehaviour
     private string LoadGame(string inString)
     {
         string returntext;
-
-        try
+        if (!inString.Equals(""))
         {
-            SaveGame save = JsonUtility.FromJson<SaveGame>(System.IO.File.ReadAllText(Application.persistentDataPath + "/" + inString + ".json"));
-
-            if (!SceneManager.GetActiveScene().name.Equals(save.sceneName))
+            try
             {
-                GameResources._loadSaveOnStart = inString;
-                StartScene(save.sceneName);
-            }
-            else
-            {
-                StartCoroutine(LoadScene(inString));
-            }
+                SaveGame save = JsonUtility.FromJson<SaveGame>(System.IO.File.ReadAllText(Application.persistentDataPath + "/" + inString + ".json"));
 
-            returntext = "loaded your game from : " + Application.persistentDataPath + "/" + inString + ".json";
+                if (!SceneManager.GetActiveScene().name.Equals(save.sceneName))
+                {
+                    GameResources._loadSaveOnStart = inString;
+                    StartScene(save.sceneName);
+                }
+                else
+                {
+                    StartCoroutine(LoadScene(inString));
+                }
+
+                returntext = "loaded your game from : " + Application.persistentDataPath + "/" + inString + ".json";
+            }
+            catch (Exception ex) { returntext = ex.Message; }
+        }else
+        {
+            returntext = GameResources._missingLoadName;
         }
-        catch (Exception ex) { returntext = GameResources._error + ex.Message; }
 
         return returntext;
     }
@@ -277,12 +292,17 @@ public class CommandLineInterface : MonoBehaviour
             {
                 lights.SetActive(true);
             }
-            else
+            else if (inString.Equals("off"))
             {
                 lights.SetActive(false);
             }
+            else if (inString.Equals(""))
+            {
+                inString = lights.activeSelf.ToString();
+            }
+            else { return GameResources._error; }
 
-            return "Lights are switched" + inString;
+            return "Lights are : " + inString;
         }
         else
         {
@@ -290,6 +310,62 @@ public class CommandLineInterface : MonoBehaviour
         }
 
     }
+
+    private string Screenshot(string inString)
+    {
+        StartCoroutine(TakeScreenShot());
+        return "";
+    }
+    private string QuitGame(string inString)
+    {
+        switchGui(onOff: "off");
+        Application.Quit(0);
+        return "bye";
+    }
+    public string StartGame(string inString)
+    {
+        switchGui(onOff: "off");
+        StartScene("mansion");
+        return "loaded mansion";
+    }
+    private string EndGame(string inString)
+    {
+        switchGui(onOff: "off");
+        StartScene("main");
+        return "Returned to Main Menu";
+    }
+    public string Flicker(string inString)
+    {
+        if (flicker != null && player != null)
+        {
+
+            if (inString.Equals("on"))
+            {
+                if (!flicker.isFlickering)
+                {
+                    flicker.begin();
+                }
+            }
+            else if (inString.Equals("off"))
+            {
+                if (flicker.isFlickering)
+                {
+                    flicker.end();
+                }
+            }else if (inString.Equals(""))
+            {
+                inString = flicker.isFlickering.ToString();
+            }
+            else { return GameResources._error; }
+        }
+        else
+        {
+            return GameResources._error;
+        }
+
+        return "Flashlight Flickering is " + inString;
+    }
+
     private string Help(string inString)
     {
         string helpstring = "";
@@ -359,81 +435,19 @@ public class CommandLineInterface : MonoBehaviour
             case "intro":
                 helpstring = GameResources._help_intro;
                 break;
+            case "bloodmoon":
+                helpstring = GameResources._help_bloodmoon;
+                break;
             case "":
                 helpstring = GameResources._help_empty;
+                break;
+            default:
+                helpstring = GameResources._nohelpwiththat;
                 break;
         }
 
         return helpstring;
     }
-
-
-    private string Screenshot(string inString)
-    {
-        StartCoroutine(TakeScreenShot());
-        return "";
-    }
-    private string QuitGame(string inString)
-    {
-        switchGui(onOff: "off");
-        Application.Quit(0);
-        return "bye";
-    }
-    public string StartGame(string inString)
-    {
-        switchGui(onOff: "off");
-        StartScene("mansion");
-        return "loaded mansion";
-    }
-    private string EndGame(string inString)
-    {
-        switchGui(onOff: "off");
-        StartScene("main");
-        return "Returned to Main Menu";
-    }
-    public string Flicker(string inString)
-    {
-        if (flicker != null && player != null)
-        {
-
-            if (inString.Equals("on"))
-            {
-                if (!flicker.isFlickering)
-                {
-                    flicker.begin();
-                }
-            }
-
-            if (inString.Equals("off"))
-            {
-                if (flicker.isFlickering)
-                {
-                    flicker.end();
-                }
-            }
-
-            if (inString.Equals(""))
-            {
-
-                if (flicker.isFlickering)
-                {
-                    flicker.end();
-                }
-                else
-                {
-                    flicker.begin();
-                }
-            }
-        }
-        else
-        {
-            return "i cannot do that now";
-        }
-
-        return "Flashlight Flickering is " + flicker.isFlickering;
-    }
-    
-
     private void initCommandList()
     {
         CommandList.Add("clear", Clear);
@@ -463,7 +477,7 @@ public class CommandLineInterface : MonoBehaviour
 
         if (Input.GetKeyUp(KeyCode.UpArrow))
         {
-            if ((history_cursor + 1) < history.Count )
+            if ((history_cursor + 1) < history.Count)
             {
                 history_cursor += 1;
                 input.text = history[history_cursor];
@@ -472,14 +486,14 @@ public class CommandLineInterface : MonoBehaviour
 
         if (Input.GetKeyUp(KeyCode.DownArrow))
         {
-            if((history_cursor - 1) >= 1)
+            if ((history_cursor - 1) >= 1)
             {
                 history_cursor -= 1;
                 input.text = history[history_cursor];
             }
-            
+
         }
-        
+
         if (Input.GetKeyUp(KeyCode.F1))
         {
             isOn = !isOn;
@@ -565,7 +579,7 @@ public class CommandLineInterface : MonoBehaviour
         if (cmd.Length > 1 && CommandList.ContainsKey(cmd[0]))
         {
             output.text = CommandList[cmd[0]].Invoke(cmd[1]);
-            history.Add(cmd[0]+" "+ cmd[1]);
+            history.Add(cmd[0] + " " + cmd[1]);
         }
 
         if (cmd.Length == 1 && CommandList.ContainsKey(cmd[0]))

@@ -7,6 +7,9 @@ public class LookAt : MonoBehaviour {
     public Transform target;
 
     void Update () {
-        transform.LookAt (new Vector3 (target.position.x, transform.position.y, target.position.z));
+        Vector3 heading = target.transform.position - transform.position;
+        Vector3 heading2d = new Vector2(heading.x, heading.z).normalized;
+        float angle = Mathf.Atan2(heading2d.y, heading2d.x) * -Mathf.Rad2Deg + 90;
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.up);
     }
 }

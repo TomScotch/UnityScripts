@@ -9,25 +9,24 @@
     // list of the commands available 
     public const string _cmdlist =
         "listscenes \n" +
-        "scene <name> \n" +
-        "credits \n" +
+        "scene <name> ; " +
+        "credits ; " +
         "clear \n" +
-        "cmdlist \n" +
-        "help <name> \n" +
+        "help <name> ; " +
         "quit \n" +
         "fps <on/off> \n" +
-        "start \n" +
+        "start  ; " +
         "stop \n" +
-        "load <name> \n" +
+        "load <name> ; " +
         "save <name> \n" +
         "screenshot \n" +
-        "turnlights <on/off>\n" +
+        "turnlights <on/off>;" +
         "flicker <on/off>  \n" +
-        "controls \n" +
+        "controls ; " +
         "checklist \n" +
-        "bloodmoon <on/off> \n" +
+        "bloodmoon <on/off> ; " +
         "evileyes <on/off> \n" +
-        "intro \n" +
+        "intro ; " +
         "listsaves \n";
 
     // description of player controls
@@ -56,6 +55,10 @@
     public const string _success = "successfully done";
     public const string _missing = "please provide a parameter";
     public const string _command_input_empty = "Please type help or cmdlist";
+    public const string _scene_missing = "can't find a Scene with that name : ";
+    public const string _nohelpwiththat = "there is no command with that name i could help you with";
+    public const string _missingSaveName = "please provide a name to save your game !";
+    public const string _missingLoadName = "please provide the name of your save game to load !";
 
     // description of command when used with help
     public const string _help_scene = "loads the scene";
@@ -80,7 +83,7 @@
     public const string _help_evileyes = "activate evil eyes for statues";
     public const string _help_zoom = "brings your sight closer to the scene";
     public const string _help_intro = "Read the Game Introduction";
-    public const string _help_checklist= "Game Dev Feature Checklist";
+    public const string _help_checklist = "Game Dev Feature Checklist";
 
     // CHECKLIST FOR TESTING    
     public const string checklist =
